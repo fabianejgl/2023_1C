@@ -1,0 +1,114 @@
+Anotaciones PRIMERA TEORICA
+--------------COMANDOS----------------
+ls
+echo
+ls -alh 			esto muestra TODOS los archivos, los ocultos tambien
+cp readme.txt documents/	se copia el archivo
+cp readme.txt readme.txt.copia	se duplica el archivo
+cp -a myMusica/ myMedia/	copia un directorio adentro de otro
+rm documents/readme.txt	borra	
+mv readme.txt documents/	mueve
+rm -rf myMedia/myMusica/	borra el directorio recursivamente, si tiene archivos dentro también los borra y la f es para FORZAR.
+mv myMusic/ myMedia/		mueve directorio a otro
+rsync -av images/ images2/	manda lo de images a images2 (sirve para hacer backups ya que los archivos ya copiados no se vuelven a copiar, y si se corta la copia de archivos por X razón, se queda donde estaba antes, cosa que no hace el comando cp)
+
+touch archivo.txt		crea archivo vacio
+> archivo2.txt			tambien crea archivo vacio
+du -sh /var/lib/		muestra el tamaño
+du -sh /var/lib/*		muestra el tamaño de todos los elementos en una lista
+
+stat readme.txt			muestra nombre espacio directoriodondeestamontado permisos fechas de modif
+zip -r images.zip images	comprime el directorio images y genera el images.zip
+unzip images.zip		descomprime
+zipinfo images.zip		info del zip y sus archivos
+tree				me muestra un arbol del directorio donde estoy parado
+find . -mtime +5		busca en el directorio donde estoy y que tengan fecha de modif mayor a 5 días
+find . -iname 'data*'		busca archivos que empiecen con data (gracias al "*", sino solo busca data) en el directorio "."
+find . -iname 'Data*'		tambien lo va encontrar gracias al "i" ya que es CASE INSENSITIVE, le da igual la mayuscula
+find . -name 'Data*'		no lo va encontrar
+
+find . -iname 'archivo*' -delete	borra lo que encuentra
+
+cal				muestra el calendario
+date				muestra la fecha de hoy
+date -d "+7 days"		muestra 7 días despues
+bc				calculadora simple
+ps fax				muestra procesos corriendo
+kill n				mata el n°de proceso n, lo saco de ps fax
+killall nombre			mata procesos por nombre
+curl https://nombrepag.com.ar	te muestra el codigo de la pagina
+curl ifconfig.me		muestra tu ip pública
+
+cat 				muestra contenido de archivos
+less
+head 
+tail
+mkdir
+rmdir
+sed
+awk
+
+grep				filtra texto
+grep hola readme.txt		muestra las lineas con "hola"
+cat readme.txt	| grep hola	muestra lineas de readme con "hola"
+grep hola readme.txt		es lo mismo de arriba pero es "peor"
+cat readme.txt | grep hola | grep pelado	podes poner varios
+grep -v hola readme.txt		muestra los que NO tienen "hola"
+grep -l hola readme.txt		muestra archivos que tienen "hola" creo
+grep -l adios readme.txt	no muestra ningun archivo
+
+----Obtención de info-----
+man
+apropos
+pwd
+who
+uptime
+uname -a
+
+
+df -h				muestra los discos y su tamaño
+top 				muestra los procesos y uso de recursos
+history				muestra todos los comandos ejecutados
+history | grep hola		muestra los comandos donde aparece "hola"
+CTRL + R	algo		muestra el ultimo comando donde aparece "algo"	y si vuelvo a hacer CTRL + R busca el anterior comando con esa palabra
+
+CTRL + flecha			mueve entre palabras
+CTRL + E			FINAL DE LINEA
+CTRL + A			PRINCIPIO DE LINEA
+CTRL + C			CORTA EL COMANDO QUE CORRE
+CTRL + L			LIMPIA TERMINAL
+CTRL + W			BORRA ULTIMA PALABRA
+CTRL + T			INTERCAMBIO ULTIMOS 2 CARACTERES
+ESC + T				INTERCAMBIA ULTIMAS DOS PALABRAS DEL CURSO
+
+exit o CTRL + D				PARA SALIR DE SERVIDOR
+
+ls -l /usr/bin/passwd
+
+-whereis x
+-find x
+
+-pwd
+-dif
+-nano archivo		me deja editar archivos
+
+-man x			lleva al manual de x
+-sudo su 		convierto en administrador
+-explainshell.com	explica qué hace el comando que le mando
+
+source archivo			corre el programa
+-máquina virtual (no hacer):
+	-corre el pgroama bomba, que hace un proceso que llama a un proceso que llama a un proceso etc.
+
+-Saber hacer Makefile
+sysarmy.com
+
+-------------------------------MAKEFILE-----------------------------------
+
+
+
+
+------Aprobacion------
+-TALLERES ENTRAN AL PARCIAL
+-encuesta fin cuatri
+-APROBAR TP y 2 parciales
