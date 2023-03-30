@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/wait.h>
+#include <sys/wait.h>				/*Hay que incluir a wait*/
 
 void jorge(){
 	write(1, "Soy Jorge\n", 10);
@@ -11,7 +11,7 @@ void jorge(){
 void juan(){
 	write(1, "Soy Juan\n", 10);
 	sleep(1);
-	wait(NULL);
+	wait(NULL);						/*Acá espera a que uno de los hijos termina, como la única es Jeniffer, la espera a ella*/
 	
 	pid_t pid = fork();
 	if (pid == 0) {
@@ -32,7 +32,7 @@ void julieta(){
 	if (pid == 0) {
 		jennifer();			
 	} else {
-		wait(NULL);
+		wait(NULL);					/*Acá Julieta espera a que termine Jennifer, pero igual no es necesario ya que Juan espera solo a que termine la hija no los nietos*/
 	}
 }
 int main(int argc, char const *argv[]){
