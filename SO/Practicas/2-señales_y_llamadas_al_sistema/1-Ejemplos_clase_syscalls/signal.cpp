@@ -20,7 +20,7 @@ void hijo1(){
 	write(1, create_message, sizeof(create_message));
 	int q = sleep(10);
 	printf("1: Termino mi ejecución faltando %d segundos de sueño", q);
-	exit(EXIT_SUCCESS);
+	exit(EXIT_SUCCESS);												/*Acá está EXIT porque sino vuelve a main, a la linea 42 y hijo1 pasaría a tener un hijo más, lo cual no quiero.*/
 }
 
 void hijo2(){
