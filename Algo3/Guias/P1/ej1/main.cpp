@@ -18,12 +18,11 @@ bool subset_sum(vector<int> &c, int i, int j){
 
     if (i == 0) return (j == 0);        //Caso base, chequeo si es solución válida.
 
-
+    //BACKTRACKING
     //Chequeo soluciones sin el elem actual c[i-1]
     if (subset_sum(c, i-1, j)){
         return true;
     }
-
     //Chequeo soluciones con elem actual c[i-1], se lo resto a j
     if(subset_sum(c,i-1,j-c[i-1])){
         return true;
