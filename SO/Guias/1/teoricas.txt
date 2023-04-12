@@ -1,0 +1,7 @@
+1.  Para llevarse a cabo el cambio de contexto se requieren los siguientes pasos:
+    -Guardar los registros.
+    -Guardar el IP.
+    -Si se trata de un programa nuevo, cargarlo en memoria.
+    -Cargar los registros del nuevo.
+    -Poner el valor del IP del nuevo.
+    -Otras cosas que veremos más adelante.
