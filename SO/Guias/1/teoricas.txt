@@ -5,3 +5,49 @@
     -Cargar los registros del nuevo.
     -Poner el valor del IP del nuevo.
     -Otras cosas que veremos más adelante.
+    
+2.	//dudoso, preguntar 
+
+	for R 0:15
+		pcb_0->R0 = R0
+	
+	for R 0:15
+		R0 = pcb_1->R0
+	
+	set_current_process(PCB_1->P_ID)
+	ke_reset_current_user_time()
+	ret()
+	
+	
+b- Registros - IP - cargar registros- IP nuevo - reset cronometro?
+
+
+3. 	Una systema call es 1.3 veces más cara que llamada a una función ya que implican un context switch y la ejecución del código en modo kernel.
+-Syscall: llamada a kernel del SO para hacer alguna tarea (write() por ej), son el mecanismo mediante el cual los programas de usuario pueden 
+ interactuar con el kernel del sistema operativo para acceder a recursos de hardware y servicios del sistema.
+-Función: que está definida en una biblioteca estática o dinámica, que se vincula con el programa en tiempo de compilación o en tiempo de carga, respectivamente. 
+ Estas funciones proporcionan una funcionalidad adicional, operaciones matemáticas o con strings, por ej.
+
+//*
+El tiempo de compilación y el tiempo de carga son dos conceptos importantes en el desarrollo de software y se refieren a diferentes etapas del proceso de construcción de un programa ejecutable.
+
+El tiempo de compilación se refiere al proceso de convertir el código fuente de un programa escrito en un lenguaje de programación de alto nivel a un lenguaje de bajo nivel (como código de máquina) que la computadora puede entender y ejecutar. Durante el tiempo de compilación, el compilador verifica la sintaxis y semántica del código fuente, lo traduce a un formato ejecutable y genera cualquier mensaje de error o advertencia.
+
+Por otro lado, el tiempo de carga se refiere al proceso de cargar el programa ejecutable en la memoria y prepararlo para su ejecución. Durante el tiempo de carga, el sistema operativo asigna espacio de memoria para el programa y realiza cualquier preparación necesaria para que el programa se ejecute de manera adecuada, como la resolución de símbolos y la configuración de variables de entorno.
+
+Es importante tener en cuenta que estos dos procesos son distintos, aunque están relacionados. El tiempo de compilación se produce antes de que el programa se ejecute, mientras que el tiempo de carga se produce justo antes de que el programa comience a ejecutarse. *//
+
+4.
+				←	(running a ready)
+new  → 	ready	→	running		 →     terminated
+					↓
+	        ↑    ← 	blocked
+b- Esas transiciones ocurren por el cambio de contexto debido al scheduler que decide si termina el tiempo 
+de un proceso y lo manda a esperar mientras que a otro le asigna tiempo. También puede deberse debido a E/S ya que el SO no le otorga 
+más tiempo hasta que su E/S esté lista, creo que estaría en blocked (se queda bloqueado el proceso hasta 
+que algo ocurra, tipicamente E/S). El hw comunica por una interrupición que el proceso de entrada salida
+terminó, la cual es atendida por el SO y "despierta el proceso".
+
+New es que entró un nuevo proceso al scheduler, terminated es que un proceso hizo exit().
+
+

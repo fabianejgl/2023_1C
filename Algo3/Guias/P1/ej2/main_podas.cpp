@@ -7,14 +7,14 @@ using namespace std;
 int cuad_mag(int m, vector<vector<int>> &s, int i, int j, vector<int> &c, vector<int> &p, int diag1, int diag2) {
     int n = s.size();
     if (j == n) return cuad_mag(m, s, i + 1, 0, c, p, diag1, diag2); // Siguiente fila
-    if (i == n && s[0][0] == 16 ){   //&& s[0][0] == 16          --esto era para calcular cant de cuads por numero para aprovechar indices.
-        for (int i = 0; i < n; i++){
-            for (int j = 0; j < n; j++) {
-                printf("%d ", s[i][j]);
-            }
-            printf("\n");
-        }
-        printf("\n");
+    if (i == n ){   //&& s[0][0] == 16          --esto era para calcular cant de cuads por numero para aprovechar indices.
+        // for (int i = 0; i < n; i++){
+        //     for (int j = 0; j < n; j++) {
+        //         printf("%d ", s[i][j]);
+        //     }
+        //     printf("\n");
+        // }
+        // printf("\n");
         return 1;   //encuentra solución sí o sí si llego hasta acá
     }    
     int r = 0;
@@ -50,7 +50,7 @@ int cuad_mag(int m, vector<vector<int>> &s, int i, int j, vector<int> &c, vector
 
         r += cuad_mag(m, s, i, j + 1, c, p, diag1, diag2);  //se fija soluciones habiendo tomado k actual, y abajo lo quita apra ver las soluciones sin esa
 
-        // Backtrack.
+        // Backtracking
         c[k - 1] = 0;       //borra k actual
         p[i] -= k;          //resta a parcial fila
         p[n + j] -= k;      //resta a parcial col
