@@ -1,0 +1,5 @@
+-Ej6 está bien? Lo hice viendo man system
+
+-----PARTE IPC-----
+-A partir del ej 10, hay cosas de "mensajes" que no entiendo.
+-10. 

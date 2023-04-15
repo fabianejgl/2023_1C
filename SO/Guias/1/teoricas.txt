@@ -51,3 +51,161 @@ terminó, la cual es atendida por el SO y "despierta el proceso".
 New es que entró un nuevo proceso al scheduler, terminated es que un proceso hizo exit().
 
 
+8.	No son iguales, cada uno tiene su variable local diferente, eb padre nunca
+	aumenta pero el hijo sí. Solo por memoria compartida podrían imprimir algo similar.
+
+10.
+	a. Las variables que necesitan residir en la memoria compartida son tiki y taka, ya que necesitan ser compartidas entre los dos procesos para que se puedan actualizar mutuamente.
+	b. No debe residir en el área de memoria compartida la variable temp, ya que es una variable local a cada proceso y no necesita ser compartida.
+c.
+
+int main() {
+    // Se inicializan las variables compartidas
+    tiki = 0;  // tiki
+    taka = 0;  // taka
+
+	share_mem(&tiki);
+	share_mem(&taka);
+
+    // Se crean los procesos
+    pid_t pid;
+    pid = fork();
+
+    if (pid == 0) {
+        // Proceso hijo
+        while (true) {
+            int temp = tiki;  // Lee el valor de tiki
+            temp++;
+            taka = temp;  // Escribe el valor en taka
+        }
+    } else {
+        // Proceso padre
+        pid = fork();
+        if (pid == 0) {
+            // Proceso hijo
+            while (true) {
+                int temp = taka;  // Lee el valor de taka
+                temp++;
+                tiki = temp;  // Escribe el valor en tiki
+            }
+        } else {
+            // Proceso padre
+            wait(NULL);
+        }
+    }
+
+    return 0;
+}
+
+11.
+void hijo() {
+    int val;
+    for(int i=0; i<10; i++) {
+        val = breceive(get_current_pid());
+        bsend(get_current_pid()-1, val+1);
+    }
+}
+
+int main() {
+    pid_t pid = fork();
+    if (pid == 0){
+        hijo();
+        exit(0);
+    }
+
+    int val = 0;
+    for(int i=0; i<10; i++) {
+        bsend(pid, val);        //pid es el del hijo
+        val = breceive(pid);
+    }
+    return 0;
+}
+
+12. a. La secuencia presentada no es realizable en el sistema operativo descripto porque ambos procesos están bloqueados en espera de que se envíe o reciba un mensaje. Si el proceso izquierdo está calculando y no envía un mensaje al proceso derecho, entonces el proceso derecho no puede continuar con su cómputo. Lo mismo sucede si el proceso derecho no recibe un mensaje del proceso izquierdo.
+
+Una secuencia que sí es realizable en este sistema operativo es la siguiente:
+-En el tiempo 1, el proceso izquierdo realiza su primer cálculo y envía el resultado al proceso derecho.
+-En el tiempo 2, el proceso derecho recibe el resultado del proceso izquierdo y realiza su primer cálculo.
+-En el tiempo 3, el proceso izquierdo recibe el resultado del proceso derecho y realiza su segundo cálculo.
+-En el tiempo 4, el proceso derecho recibe el resultado del proceso izquierdo y realiza su segundo cálculo.
+Y así sucesivamente...
+De esta manera, ambos procesos pueden trabajar de forma simultánea, intercambiando resultados a través de mensajes en la cola temporal de mensajes del sistema operativo. De esta forma, ninguno de los procesos se bloquea esperando el resultado del otro.
+
+	b. //preguntarrr
+	Para lograrlo se puede implementar una cola de mensajes con capacidad limitada, que permita a los procesos enviar y recibir mensajes sin bloquear indefinidamente cuando la cola esté llena.
+
+13. a) En este escenario, sería mejor utilizar un sistema de comunicación basado en memoria 
+compartida, ya que ambos procesos necesitan modificar el mismo archivo al mismo tiempo. Con la 
+memoria compartida, ambos procesos tendrían acceso al mismo archivo de memoria, lo que les 
+permitiría coordinar sus esfuerzos para modificar el archivo de manera sincronizada.
+
+b) En este caso, sería mejor utilizar un sistema de comunicación basado en el pasaje de 
+mensajes. El proceso cortarBordes debería enviar un mensaje al proceso eliminarOjosRojos para 
+avisarle que ya ha realizado su parte y que es seguro que el proceso eliminarOjosRojos comience 
+a trabajar. De esta manera, el proceso cortarBordes puede continuar sin esperar a que el proceso 
+eliminarOjosRojos termine, lo que podría ahorrar tiempo y recursos.
+
+c) En este escenario, sería mejor utilizar un sistema de comunicación basado en el pasaje de 
+mensajes. Como el proceso eliminarOjosRojos está en una ubicación remota y segura, no sería 
+práctico utilizar la memoria compartida para coordinar la comunicación entre los dos procesos. 
+En su lugar, el proceso cortarBordes debería enviar un mensaje al proceso eliminarOjosRojos para 
+coordinar su trabajo de manera segura y efectiva.
+
+14.
+Para modificar el programa del ejercicio anterior y utilizar las llamadas al sistema de comunicación entre procesos mediante pasaje de mensajes, se puede hacer lo siguiente:
+int result;
+void proceso_izquierda() {
+    result = 0;
+    while (true) {
+        send(pid_derecha, &result);
+        result = cómputo_muy_difícil_1();
+    }
+}
+void proceso_derecha() {
+    int left_result;
+    while(true) {
+        result = cómputo_muy_difícil_2();
+        receive(pid_izquierda, &left_result);
+        printf("%d %d", left_result, result);
+    }
+}
+
+En este caso, la función send() se utiliza en el proceso izquierdo para enviar el resultado de result al proceso derecho, y la función receive() se utiliza en el proceso derecho para recibir el resultado del proceso izquierdo en la variable left_result.
+
+Para garantizar el mismo comportamiento que en el programa original, la capacidad de la cola de mensajes debe ser al menos 1, ya que en cada iteración de ambos procesos se envía un mensaje y se recibe un mensaje. Si la cola tuviera capacidad cero, ambos procesos quedarían bloqueados esperando a que la cola tenga espacio disponible, lo que no sería posible en este caso.
+
+15.
+Si un sistema operativo implementara pipes como único sistema de comunicación interprocesos, las comunicaciones entre procesos estarían limitadas a un flujo de comunicación unidireccional y no podrían compartir datos estructurados en memoria. También sería más difícil sincronizar los procesos, ya que los pipes son bloqueantes y solo permiten una comunicación en un sentido.
+
+La ventaja de incorporar memoria compartida es que los procesos pueden compartir estructuras de datos complejas en memoria y sincronizarse de forma más eficiente. Además, la memoria compartida permite una comunicación más rápida y directa entre procesos, lo que puede ser beneficioso en aplicaciones de alta velocidad.
+
+Los sockets, por otro lado, permiten la comunicación entre procesos en diferentes sistemas y pueden ser utilizados para la comunicación entre procesos en diferentes máquinas en una red. Los sockets también ofrecen la capacidad de establecer conexiones de red y enviar y recibir datos en un formato estructurado. La principal ventaja de los sockets es que permiten la comunicación entre procesos distribuidos y pueden ser utilizados para aplicaciones que requieren comunicación en tiempo real en entornos distribuidos.
+
+16.
+Supongamos que tenemos dos procesos, un productor y un consumidor, que necesitan comunicarse para transferir datos entre sí. El productor produce datos y los envía al consumidor, que los consume. El escenario que se podría plantear es el siguiente:
+
+El canal de comunicación bloqueante se utiliza para la transferencia de datos críticos y en tiempo real, donde el productor debe esperar a que el consumidor reciba los datos antes de continuar produciendo nuevos datos.
+
+El canal de comunicación no bloqueante se utiliza para la transferencia de datos no críticos o en segundo plano, donde el productor puede continuar produciendo nuevos datos sin esperar a que el consumidor los reciba.
+
+Presudocodigo:
+# Proceso Productor
+while True:
+    datos = producir_datos()  # produce datos
+    enviar_datos_bloqueante(datos)  # envía datos críticos y bloquea el proceso hasta que se reciban
+
+    otros_datos = producir_otros_datos()  # produce otros datos
+    enviar_datos_no_bloqueante(otros_datos)  # envía datos no críticos y no bloquea el proceso
+
+# Proceso Consumidor
+while True:
+    datos = recibir_datos_bloqueante()  # recibe datos críticos y bloquea el proceso hasta que lleguen
+
+    procesar_datos(datos)  # procesa los datos recibidos
+
+    otros_datos = recibir_datos_no_bloqueante()  # recibe datos no críticos sin bloquear el proceso
+
+    procesar_otros_datos(otros_datos)  # procesa los otros datos recibidos
+//fin codigo
+
+En este ejemplo, el productor produce y envía datos al consumidor, utilizando el canal de comunicación bloqueante para los datos críticos y el canal no bloqueante para los datos no críticos. El consumidor recibe los datos críticos y los procesa, y luego recibe los datos no críticos sin bloquear el proceso. Esto permite que el productor continúe produciendo nuevos datos sin esperar a que el consumidor procese los datos no críticos.
