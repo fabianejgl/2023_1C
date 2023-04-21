@@ -20,6 +20,7 @@ double measure(vector<int> a) {
     auto start = chrono::high_resolution_clock::now();
 
     int n = a.size();
+    /*Acá va nuestro algoritmo*/
     for (int i=0; i<n; i++) {
         if (a[i] < n) {
             if (a[a[i]] != a[i]) {
