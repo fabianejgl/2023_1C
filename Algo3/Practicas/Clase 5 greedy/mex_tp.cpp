@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <bits/stdc++.h>
-
+#include <math.h>
 
 using namespace std;
 using namespace std;
@@ -55,18 +55,26 @@ double measure(vector<tuple<int, int, int>> activs, vector<tuple<int, int, int>>
 
 int main() {
     int repeat = 10;
-    ofstream output_file; output_file.open("runtime_tp_sorted.csv");
+    
+    //ofstream output_file; output_file.open("runtime_tp_random.csv");
+    //ofstream output_file; output_file.open("runtime_tp_sorted.csv");
+    ofstream output_file; output_file.open("runtime_tp_unsorted.csv");
     output_file << "n,time\n";
     
-    int limit = 50000;
-    for (int n=5; n<= limit; n*=10) {
-        vector<tuple<int, int, int>> input = read_input(n);
-        vector<tuple<int, int, int>> sol = vector<tuple<int, int, int>>(n);
+    //int limit = 500000;
+    for (int power = 1; power < 6; power++) {
+        for (int i=2; i <= 10; i++) {
+            int n = i * pow(10,power);
+            //if(n > limit) break;
 
-        double counter = 0;
-        for (int ignore=0; ignore<repeat; ignore++) counter += measure(input, sol);
+            vector<tuple<int, int, int>> input = read_input(n);
+            vector<tuple<int, int, int>> sol = vector<tuple<int, int, int>>(n);
+
+            double counter = 0;
+            for (int ignore=0; ignore<repeat; ignore++) counter += measure(input, sol);
         
-        output_file << n << "," << counter / repeat << endl;
+            output_file << n << "," << counter / repeat << endl;
+        }
     }
 
     output_file.close();
