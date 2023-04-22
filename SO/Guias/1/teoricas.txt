@@ -209,3 +209,8 @@ while True:
 //fin codigo
 
 En este ejemplo, el productor produce y envía datos al consumidor, utilizando el canal de comunicación bloqueante para los datos críticos y el canal no bloqueante para los datos no críticos. El consumidor recibe los datos críticos y los procesa, y luego recibe los datos no críticos sin bloquear el proceso. Esto permite que el productor continúe produciendo nuevos datos sin esperar a que el consumidor procese los datos no críticos.
+
+17.
+EL problema es que en el padre se hace un breceive con el pid del hijo, y existe la posibilidad de que
+todavía no se haya establecido el valor del pid_hijo, entonces habría un error. Agregar un sleep(1)
+en el padre debería ser suficiente tiempo para que corra antes la primer linea del hijo.

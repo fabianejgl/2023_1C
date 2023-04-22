@@ -6,7 +6,6 @@
 #include "constants.h"
 #include "mini-shell-parser.c"
 
-
 static void runChildren(char ** prog, int pipes[][2], int n, int program_count){
 	for(int i = 0; i < program_count - 1; ++i){
 		if( i == n - 1){
@@ -25,8 +24,6 @@ static void runChildren(char ** prog, int pipes[][2], int n, int program_count){
 	execvp(prog[0],prog);
 }
 
-
-//PROGS es un vector hacia... donde empieza cada instruccion?
 static int run(char ***progs, size_t count)
 {	
 	int r, status;
@@ -35,35 +32,29 @@ static int run(char ***progs, size_t count)
 	//TODO: Guardar el PID de cada proceso hijo creado en children[i]
 	pid_t *children = malloc(sizeof(*children) * count);
 	int pipes[count - 1][2];
-
-	for (int i = 0; i < count - 1; ++i){
+	for(int i = 0; i < count - 1; ++i){
 		int status = pipe(pipes[i]);
-		if (status==-1){
-			exit(-1);
-		}		
-	}
-
-	for (int i = 0; i < count; ++i){
-		//Hijo
-		children[i] = fork();
-		if (children[i]==0){
-			runChildren(progs[i], pipes, i, count);
-		}
+		if(status == -1 ) exit(-1);
 	}
 	
-	for (int i = 0; i < count; ++i){
+	for(int i = 0 ; i < count ; ++i){
+		children[i] = fork();
+		if(children[i] == 0){
+			runChildren(progs[i], pipes, i, count);
+		}
+	} 
+
+	for(int i = 0; i < count - 1; ++i){
 		close(pipes[i][0]);
 		close(pipes[i][1]);
 	}
 	
-
 	//TODO: Pensar cuantos procesos necesito
 	//TODO: Pensar cuantos pipes necesito.
 
 	//TODO: Para cada proceso hijo:
 			//1. Redireccionar los file descriptors adecuados al proceso
 			//2. Ejecutar el programa correspondiente
-
 
 	//Espero a los hijos y verifico el estado que terminaron
 	for (int i = 0; i < count; i++) {

@@ -10,13 +10,25 @@ np.random.seed(1337)
 #         f.write(str(num) + " ")
 #     f.close()
 #"""
-for power in range(1,5):
-    n = 5 * (10**power) #n = cant actividades, 5 50 500 5000
+for power in range(3,8):
+    n = 2 * (10**power) #n = cant actividades, 5 50 500 5000
     f = open("inputs/input_" + str(n), "w")
     
     for num in range(n):
-        input2 = np.random.randint(2,2*n)
-        input1 = np.random.randint(0,input2-1)   
+        input2 = np.random.randint(1,2*n+1)
+        input1 = np.random.randint(0,input2)   
         f.write(str(input1) + ' ' + str(input2) + '\n')
     f.close()
 
+#
+# for pow in range (1,6): 
+#   for x in range(1,10,2):
+#     n = x * (10**pow)
+#     f = open("inputs/input_" + str(n), "w")
+#     input = np.random.randint(0,2*n,n)
+#     for num in range(n):
+#       input2 = np.random.randint(1,2*n+1)
+#       input1 = np.random.randint(0,input2)   
+#       f.write(str(input1) + ' ' + str(input2) + '\n')
+#     f.close()
+#

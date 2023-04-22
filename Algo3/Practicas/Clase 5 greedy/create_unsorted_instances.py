@@ -9,7 +9,7 @@ import numpy as np
 #         f.write(str(num) + " ")
 #     f.close()
 
-for power in range(1,5):
+for power in range(1,6):
     n = 5 * (10**power) #n = cant actividades, 5 50 500 5000
     f = open("inputs/input_" + str(n), "w")
     

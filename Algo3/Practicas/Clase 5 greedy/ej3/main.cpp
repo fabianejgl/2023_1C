@@ -1,12 +1,22 @@
 #include <iostream>
 #include <vector>
+#include <list>
 #include <bits/stdc++.h>
  
 using namespace std;
  
 //vector<tuple<int, int, int>> acts, sol;
 //vector<int> indice;
- 
+/*
+#define 
+
+void bucket_sort(vector<tuple<int,int,int>>& activs){
+    int n = activs.size();
+    vector<list<tuple<int,int,int>>> buckets(2*n+1);
+    for(auto a : activs){
+        if ()
+    }
+}*/
  
 int mayor_sub_conjunto(const vector<tuple<int,int,int>>& activs, vector<tuple<int,int,int>>&  sol) {
     //ordenar
