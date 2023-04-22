@@ -15,7 +15,7 @@ for power in range(1,5):
     f = open("inputs/input_" + str(n), "w")
     
     for num in range(n):
-        input2 = np.random.randint(0,2*n)
+        input2 = np.random.randint(2,2*n)
         input1 = np.random.randint(0,input2-1)   
         f.write(str(input1) + ' ' + str(input2) + '\n')
     f.close()

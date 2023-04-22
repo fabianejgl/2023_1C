@@ -9,6 +9,8 @@ using namespace std;
  
  
 int mayor_sub_conjunto(const vector<tuple<int,int,int>>& activs, vector<tuple<int,int,int>>&  sol) {
+    //ordenar
+    sort(activs.begin(),activs.end(), comparar_por_elem);
     sol[0] = activs[0];
     int t_iAnterior = get<1>(activs[0]);
     int contador = 1;
@@ -40,8 +42,7 @@ int main() {
         acts[i] = make_tuple(inicio,final,indice);
     }
  
-    //ordenar
-    sort(acts.begin(),acts.end(), comparar_por_elem);
+    
  
     /*for (int i = 0; i < actividades; i++){
         cout << get<0>(acts[i]) << get<1>(acts[i]) << get<2>(acts[i]) << endl;
