@@ -56,8 +56,8 @@ double measure(vector<tuple<int, int, int>> activs, vector<tuple<int, int, int>>
 int main() {
     int repeat = 10;
     
-    //ofstream output_file; output_file.open("runtime_tp_random.csv");
-    //ofstream output_file; output_file.open("runtime_tp_sorted.csv");
+    // ofstream output_file; output_file.open("runtime_tp_random.csv");
+    // ofstream output_file; output_file.open("runtime_tp_sorted.csv");
     ofstream output_file; output_file.open("runtime_tp_unsorted.csv");
     output_file << "n,time\n";
     

@@ -14,9 +14,9 @@ df_sorted = pd.read_csv("runtime_tp_sorted.csv")
 df_unsorted = pd.read_csv("runtime_tp_unsorted.csv")
 
 #Vemos la correlación de nuestras medidas con la cota teórica que estimamos
-df['cota'] = nlogn(df['n'])
-df_sorted['cota'] = nlogn(df_sorted['n'])
-df_unsorted['cota'] = nlogn(df_unsorted['n'])
+df['cota'] = df['n']
+df_sorted['cota'] = df_sorted['n']
+df_unsorted['cota'] = df_unsorted['n']
 
 #Dibujamos los graficos con escala normal
 #Random
