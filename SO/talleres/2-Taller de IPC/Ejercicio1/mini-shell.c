@@ -10,12 +10,14 @@
 static void runChildren(char ** prog, int pipes[][2], int n, int program_count){
 	//REDIRECCIONO
 	for(int i = 0; i < program_count - 1; ++i){
+		//N = ÍNDICE QUE PASO POR PARÁMETRO
 		if( i == n - 1){
-			//ULTIMO CASO
+			//ANTE-ULTIMO CASO
 			close(pipes[i][PIPE_WRITE]);
 			dup2(pipes[i][PIPE_READ], STD_INPUT);	//IMPRIME PANTALLA, POR ESO SE USAN COUNT-1 PIPES??????????????
 		}
 		else if(i == n){
+			//ULTIMO caso
 			close(pipes[i][PIPE_WRITE]);
 			dup2(pipes[i][PIPE_READ], STD_OUTPUT);
 		}
