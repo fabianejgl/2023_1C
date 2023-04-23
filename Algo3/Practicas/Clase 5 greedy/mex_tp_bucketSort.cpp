@@ -9,6 +9,10 @@
 using namespace std;
 using namespace std;
 
+#define S_i 0
+#define T_i 1
+#define INDEX 2
+
 vector<tuple<int, int, int>> read_input(int size) {
     vector<tuple<int, int, int>> input(size);   /**/
 
@@ -25,9 +29,24 @@ vector<tuple<int, int, int>> read_input(int size) {
     return input;
 }
 
-//aux sort
-bool comparar_por_elem(tuple<int,int,int> a, tuple<int,int,int> b){
-    return get<1>(a) < get<1>(b);
+void bucket_sort(vector<tuple<int,int,int>>& activs) {
+    int n = activs.size();
+    vector<list<tuple<int,int,int>>> buckets(2*n+1);
+    //Meter en buckets
+    for(tuple<int,int,int> a : activs){
+        int b = get<T_i>(a);
+        buckets[b].push_back(a);
+    }
+    //Sacar de los buckets al vector original
+    int i = 0;
+    for(int b = 0; b < buckets.size(); b++){
+        while (!buckets[b].empty())
+        {
+            activs[i] = buckets[b].front();
+            buckets[b].pop_front();
+            i++;
+        }
+    }
 }
 
 double measure(vector<tuple<int, int, int>> activs, vector<tuple<int, int, int>> sol) {
@@ -36,13 +55,13 @@ double measure(vector<tuple<int, int, int>> activs, vector<tuple<int, int, int>>
     //int n = a.size();
     /*Acá va nuestro algoritmo*/
 
-    sort(activs.begin(),activs.end(), comparar_por_elem);
+    bucket_sort(activs);
     sol[0] = activs[0];
-    int t_iAnterior = get<1>(activs[0]);
+    int t_iAnterior = get<T_i>(activs[0]);
     int contador = 1;
     for (int i = 1; i < activs.size(); i++) {
-        if (get<0>(activs[i]) >= t_iAnterior) {
-            t_iAnterior = get<1>(activs[i]);
+        if (get<S_i>(activs[i]) >= t_iAnterior) {
+            t_iAnterior = get<T_i>(activs[i]);
             sol[contador] = activs[i];
             contador++;
         }
