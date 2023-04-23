@@ -59,18 +59,34 @@ plt.ylabel("log_acts")
 plt.savefig("plots/plt_unsorted_log.png")
 
 #Hacemos ahora para compararlos entre ellos
-#Usamos el tiempo del random como referencia
+#Escala lineal
 df['time_sorted'] = df_sorted['time']
 df['time_unsorted'] = df_unsorted['time']
 
 fig, ax = plt.subplots()
 
-
-ax.scatter(df['n'],df['time'],color='red', label='sorted')
-ax.scatter(df['n'],df['time_sorted'],color='red', label='sorted')
-ax.scatter(df['n'],df['time_unsorted'],color='blue', label='unsorted')
+ax.scatter(df['n'],df['time'],color='yellow', label='random')
+ax.scatter(df['n'],df['time_sorted'],color='blue', label='sorted')
+ax.scatter(df['n'],df['time_unsorted'],color='red', label='unsorted')
 plt.xlabel("n")
 plt.ylabel("tiempo (s)")
 
 ax.legend()
 ax.grid(True)
+
+plt.savefig("plots/comparacion_lineal")
+#Escala logaritmica
+ax.scatter(np.log(df['n']),np.log(df['time']),color='yellow')
+ax.plot(np.log(df['n']),np.log(df['time']),color='yellow', label='random')
+ax.scatter(np.log(df['n']),np.log(df['time_sorted']),color='blue')
+ax.plot(np.log(df['n']),np.log(df['time_sorted']),color='blue', label='sorted')
+ax.scatter(np.log(df['n']),np.log(df['time_unsorted']),color='red')
+ax.plot(np.log(df['n']),np.log(df['time_unsorted']),color='red', label='unsorted')
+
+plt.xlabel("log_n")
+plt.ylabel("log_tiempo (s)")
+
+ax.legend()
+ax.grid(True)
+
+plt.savefig("plots/comparacion_log")
