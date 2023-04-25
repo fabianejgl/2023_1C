@@ -7,13 +7,22 @@
 #include "mini-shell-parser.c"
 
 
-static void runChildren(char *** prog, int pipes[][2], int n, int program_count){
-	//REDIRECCIONO según casos
-
-	if (n==0){
-		dup2(pipes[0][PIPE_WRITE], STD_OUTPUT);	//escribe en su pipe
-		for (int i = 0; i < program_count; i++)
-		{
+static void runChildren(char ** prog, int pipes[][2], int n, int program_count){	//n = hijo actual
+	//REDIRECCIONO
+	for(int i = 0; i < program_count - 1; ++i){	//cierra todo menos los 2 que usa en hijo i (n) 
+		//N = ÍNDICE QUE PASO POR PARÁMETRO
+		if( i == n - 1){
+			//si llegó al proceso/hijo anterior
+			close(pipes[i][PIPE_WRITE]);			//cierro su write porque nadie le va escribir
+			dup2(pipes[i][PIPE_READ], STD_INPUT);	//
+		}
+		else if(i == n){
+			//ULTIMO caso
+			close(pipes[i][PIPE_WRITE]);
+			dup2(pipes[i][PIPE_READ], STD_OUTPUT);
+		}
+		else{
+			//cierra todos los demás casos
 			close(pipes[i][PIPE_WRITE]);
 			close(pipes[i][PIPE_READ]);
 		}
@@ -52,25 +61,22 @@ static int run(char ***progs, size_t count)
 	//TODO: Guardar el PID de cada proceso hijo creado en children[i]
 	pid_t *children = malloc(sizeof(*children) * count);
 
-	//Si tengo COUNT instrucciones creo vector PIPES de COUNT-1 * 2 lugares, el -1 es porque para el último no necesito creo
+	//count-1 porque al ultimo no lo conecta con nada
 	int pipes[count - 1][2];
 
 	for (int i = 0; i < count - 1; ++i){
-		int status = pipe(pipes[i]);	//qué devuelve el pipe? Sé que int, pero status a que se refiere?
-		if (status==-1){				//en qué caso podría entrar acá????
-			exit(-1);
-		}		
+		int status = pipe(pipes[i]);	//qué devuelve el pipe? Sé que int, pero status a que se refiere?		
 	}
 
 	for (int i = 0; i < count; ++i){
 		//Hijo
 		children[i] = fork();	//en la pos i SE GUARDA EL PID DEL HIJO i
-		if (children[i]==0){	//????????????????????????????????? Nunca entraría acá o sí?
-			runChildren(progs, pipes, i, count);	//pasa parámetros
+		if (children[i]==0){	//Para todos los hijos hace esto, ya que son == 0
+			runChildren(progs[i], pipes, i, count);	//pasa parámetros
 		}
 	}
 	
-	//cierra todos los pipes del 0 al count-1
+	//cierra todos los pipes por las dudas al final, para le padre y ¿cada hijo?.
 	for (int i = 0; i < count; ++i){
 		close(pipes[i][0]);
 		close(pipes[i][1]);
