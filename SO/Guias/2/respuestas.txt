@@ -1,0 +1,157 @@
+-------------1.-----------------
+cpu: 0 a al 2, 11 a 13, 21 22.
+E/S: El resto de E/S
+
+---------------2.-------------------
+RR: no porque le da mucho tiempo a P2, mientras que P1 y P0 no lo requieren pues la usan muy poco.
+-> cconvendría usar prioridades, y que P1 y P0 sean de mayor prioridad (menor número) y P2 de menor, para
+que se ejecute cuando no haya de los otros 2.
+
+------------------3.------------------------ 
+Tipo de scheduler? Nonpreemptive. Solo libera voluntariamente el scheduler cuadno termina o cuando se bloquea esperando I/O
+
+--------------------4.-----------------
+RR:                         Funca
+Por prio:                   sí, si vienen muchos
+SJF:                        sí, si vienen muchos cortos
+SJF:                        sí, si vienen muchos cortos también
+FIFO/FCFS:                  Nunca
+Colas mult                  sí
+Colas mult con feedback     Nunca
+
+--------------------5.--------------------
+El tiempo de espera de cada proceso aumentaría en teoría y qué pasa si el proceso1 termina en el primer quantum q se le da????
+
+Ventajas:?
+Desventajas:?
+
+----------------------7.--------------------
+a.          WT  TA
+P1          0   3
+P2          9   15
+P3          4   8
+P4          15  20
+P5          8   10
+P6          8   10
+PROMEDIO    7   11.2
+
+
+
+b. ShortesRemainingTime
+
+
+-----------------------8.---------------------
+P1  8   0.0 
+P2  4   0.4
+P3  1   1.0
+
+FCFS        TA
+P1          8
+P2          12
+P3          13
+*PROMEDIO*    11
+
+SJF         TA
+P1          8
+P2          13
+P3          9
+*PROMEDIO*  10
+
+SJF         TA
+P1          13 + 1 de idle  =14
+P2          5  + 1 de idle  =6
+P3          1  + 1 de idle  =2
+*PROMEDIO*  7.3
+
+--------------------9.--------------------------
+
+----RR----QUANTUM = 10
+P1 P2 P3 P4
+
+GANTT:      P1 - P2*10 - P3 - P4*10
+
+OBS: TARDAN TODO LO MISMO
+
+
+--------------------10.--------------------------
+a.
+-ROUND-ROBIN Q=5-
+GANTT:      P1*5 - P2*5 - P1*3 - P2*3 - P3*5 - P4*5 - P3*1
+
+*****SI EN EL SEGUNDO 9 LLEGABA EL P3, AL TERMINAR LOS 5 SEGUNDOS DEL P2 SE EJECUTABA EL P1 O P3????????*****
+*****Creo que el P1*****
+
+b.
+-TSR-
+GANTT:      P1*5 - P1*3 - P2*6 - P2*2 - P3*1 - P3*5 - P4*5
+*****EN EL INSTANTE 15 SI SON IGUALES SE QUEDA CORRIENDO EL ACTUAL*****
+
+C.
+
+R-R         TA
+P1          13
+P2          16
+P3          27
+P4          26
+*PROMEDIO*  20.5
+
+-TSR-       TA
+P1          8
+P2          16
+P3          22
+P4          27
+*PROMEDIO*  18.25
+
+d. Mucho menos?? Sí, RR tarda más pero para procesos Real Time o interactivos los atendría, probablemente, más rápido que con SRT
+*****PREGUNTAR*****
+
+--------------------12.------------------------
+*****PREGUNTAR*****
+Los favorecería porque los de entrada y salida son procesos que usan muy poco el procesador hasta quedar bloqueados, y
+la vez no generaría Starvation ya que si esos procesos cortos de entrada y salida son muy repetitivos entonces en algún momento
+le darían priorida a los de cpu que usaron poco el cpu. Es válido imaginarlo como varias colas como en el ejempo del parcial??
+
+--------------------13.------------------------
+*****Diferencia FIFO FCFS??????????????????
+En FIFO los trabajados más cortos son desfavorecidos si llegaron justo después de uno largo
+En ROUND-ROBIN los favorecen pues a lo mucho esperaran quantum*cant-procesos-delante
+En multilevel feedback queue no estaría seguro pues depende de si es de I/O o si hace todo en cpu. Tambien
+dependería de si empiezan con prioridad maxima, media o minima. En general creo que debería favorecerle?
+*****PREGUNTAR.
+
+--------------------14.------------------------
+*****PREGUNTAR*****
+
+Creo que alcanza con hacer una multilevelQueue
+-Donde haya 2 o más listas, la primera de Prioridad 1 sería exclusivamente de las Alarmas de Robo Y la manejaría con FCFS suponiendo que quiero atender la primer emergencia lo más rápido posible, sino RR
+
+-Las demás tareas si sos todas de igual prioridad las haría con RR
+    -De ser todas interactivas entonces solo una cola más de RR
+    -Si hay también que usan mucha cpu entonces haría 2/3 colas para que vayan subiendo o bajando según usen I/O o termine su Quantum,
+    ya que todas serán RR.
+
+
+--------------------15.------------------------
+*****PREGUNTAR*****
+Utilizaría RR ya que a lo mucho tardará Q*cant-tareas-delante para cualquier tarea, pero si se hace FCFS tardaría mucho más
+pues los Batch son un proceso largo y si uno viene antes de una interactiva el tiempo de respuesta será muy tardío.
+No perjudica el throughput pues las interactivas serán atendidas rapidamente por ende los Batch no quedarían en Ready
+mucho tiempo y volverán a su ejecución.
+
+--------------------16.------------------------
+
+RR - n oconviene porque no aplica los cambios lo antes posible y tal vez se imprima lo que quería hacer zoom in antes de realizarse.
+Podría usarse si el tiempo de Q = el tiempo que tarda los botones en aplicar su cambio, de esa forma podrán aplicarse de forma rápida, no?
+
+2 colas de prioridad, una para los botones y otra para generar las imágenes
+La de botones tendría más prioridad para generar los cambios
+
+Otra opción puede ser SRJF ya que el proceso de los botones es corto en comparación con la generación de imágenes continua
+
+-Una polı́tica posible consiste en correr el proceso más cercano
+a perder su deadline (EDF: Earliest-Deadline-First).    TEORICA
+Esto sirve sabiendoq que los botones tienen deadlinea
+
+
+--------------------17.------------------------
+*****?????

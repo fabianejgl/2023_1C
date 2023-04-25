@@ -16,9 +16,9 @@ int main(int argc, char **argv)
 	srand(time(NULL));
 
 	int status, pid, n, start, buffer;
-	n = atoi(argv[1]);
-	buffer = atoi(argv[2]);
-	start = atoi(argv[3]);
+	n = atoi(argv[1]);			//número que envía padre
+	buffer = atoi(argv[2]);		//
+	start = atoi(argv[3]);		//hijo que recibe mensaje
 
 	if (argc != 4){ printf("Uso: anillo <n> <c> <s> \n"); exit(0);}
     
