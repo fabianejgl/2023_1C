@@ -11,16 +11,20 @@ que se ejecute cuando no haya de los otros 2.
 Tipo de scheduler? Nonpreemptive. Solo libera voluntariamente el scheduler cuadno termina o cuando se bloquea esperando I/O
 
 --------------------4.-----------------
-RR:                         Funca
+RR:                         Nunca
 Por prio:                   sí, si vienen muchos
 SJF:                        sí, si vienen muchos cortos
 SJF:                        sí, si vienen muchos cortos también
-FIFO/FCFS:                  Nunca
-Colas mult                  sí
-Colas mult con feedback     Nunca
+FIFO/FCFS:                  Nunca,solo si WHILE(1)
+Colas mult                          Sí
+Colas mult con feedback + aging     Nunca                           //feedback es que cambie de prioridad, aging que si no se ejecuta en tanto tiempo, sube su prioridad
 
 --------------------5.--------------------
 El tiempo de espera de cada proceso aumentaría en teoría y qué pasa si el proceso1 termina en el primer quantum q se le da????
+-El que le des mas iteraciones va tener mas tiempo de cpu
+-Los demás tendrían menos
+-Si P1 tiene mucho I/O
+-
 
 Ventajas:?
 Desventajas:?
