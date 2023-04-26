@@ -1,0 +1,66 @@
+**--Estrella--**
+---------1.--------
+-Diferencia Mem viartual - Real
+Real es la dirección física real en memoria.
+
+Combinar swapping con virtualización del espacio de direcciones, y a eso se lo llama memoria virtual. Usa el MMU
+Memoria Virtual: Hacerle creer al proceso que dispone de más
+memoria de la que realmente tiene en cada momento. Con diferentes técnicas (paginación/segmentación/combinación de ambos)
+
+---------2.--------
+fragmentación externa (bloques libres pero
+pequeños y dispersos), otros fragmentación interna (espacio
+desperdiciado dentro de los propios bloques).
+
+---------3.--------
+?
+
+---------5.--------
+?
+
+---------6.--------
+?
+
+
+---------8.--------
+?
+
+---------9.--------
+Cuando una página no está en memoria la MMU emite una
+page fault que es atrapada por el SO.
+
+---------10.--------
+Parecido Ejemplo de Parcial clase.
+
+
+
+
+---------13.--------
+
+
+
+---------14.--------
+
+
+
+
+
+
+
+
+**--SIN estrela el resto--**
+
+---------4.--------
+-Porque los tamaños de las tablas de pags sond e potencia de 2
+Para ...
+
+---------7.--------
+---------11.--------
+-El 0
+-El 1 o 0? Saca al primero que entra "cargado", que sería el 0, o al de Last Ref menor, que sería el 1.?
+-El 1 también?
+
+---------12.--------
+---------15.--------
+---------16.--------
+---------17.--------

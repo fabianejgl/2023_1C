@@ -1,0 +1,34 @@
+1.
+a. NO, si tienen mem comaprtida y corrió el A solamente imprime X+1, si ente el x+1 y prinnt corrió el B, imprime 2
+b. De 
+x de 1 a 4 en todos los casos
+    Y se imprime "a" si se ejecuta y==1 entre que se hace la asignacion y = 1 y se la reasigna y=0
+
+2. Sí puede pasar que en los ifs, en un caso esté en 4, haya entrado a x++ y antes de eso llega otro que, como no se sumó
+todavía, también entra a x++, entonces pasaría directamente a 6 cuando en 5 ya debería haberse restado.
+
+3. raro. Fairness? No debería creo porque 
+**?????**
+
+4.
+Si no fuesen atómicas dos programas podrían entrar al mismo tiempo y como ambas ven que está en 1, lo ponen en 0 y entran
+es decir que no tie exclusividad ya que apenas una entra debería inhabilitar a todas las otras.
+
+5. Porque la barrera solo se abre para una persona. y nunca llegan a critica() los demás
+Solo hace falta agregar otra barrera.signal()? Luego del wait()
+EL ultimo también lo hace? A dónde va el signal?
+
+Puedo hacer MEJOR:
+barrera.signal(unsigned int n):
+    for(i = 0; i < n; i++):
+        barrera.signal()
+
+6.
+-El primer debería
+-El de barrera, hace la cantidad de señales necesarias simplemente.
+***PREGUNTAR***
+
+7.
+int K = procesos 
+sem_procesar[sem(0), ..... sem(0)] empiezan todos en 
+
