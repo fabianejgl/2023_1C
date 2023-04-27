@@ -23,12 +23,147 @@ barrera.signal(unsigned int n):
     for(i = 0; i < n; i++):
         barrera.signal()
 
-6.
+-----------6.-----------
 -El primer debería
 -El de barrera, hace la cantidad de señales necesarias simplemente.
 ***PREGUNTAR***
 
-7.
-int K = procesos 
-sem_procesar[sem(0), ..... sem(0)] empiezan todos en 
+-----------7.-----------
 
+int N = cant_procesos
+sem_procesar[sem(0), ..... sem(0)]  empiezan todos en 0
+int K = proceso_inicio
+
+proceso(i){
+
+    if(i == k){
+        sem_procesar[i].signal()
+    }
+
+    sem_procesar[i].wait()
+    procesar()
+
+    if(i != k-1){
+        sem_procesar[(i+1)%n].signal()
+    }
+
+}
+
+-----------8.-----------
+
+---a---
+enum [ABC]
+sems[sem(0), sem(0), sem(0)]  empiezan todos en 0
+
+while(true){
+
+    letra(i){
+        if(i==A){
+            sems[i].signal();
+        }
+
+        sems[i].wait()
+
+        procesar()
+        sems[(i+1)%3].signal();             //%3 pa cuando se pase, N sería en general
+    }
+}
+
+---b---
+
+enum [ABC]
+sems[sem(0), sem(0), sem(0)]  empiezan todos en 0
+
+int contador = 2
+
+while(true){
+
+    letra(i){
+        if(i==B){
+            sems[i].signal();
+            if (contador == 0){
+                sems[(i-1)%3].signal();     //%3 pa cuando de negativo
+
+                sems[i].wait()
+                contador = 3
+            }
+            contador--;
+        }
+        sems[i].wait()
+        procesar()
+
+        sems[(i-1)%3].wait()
+    }
+}
+
+---c---
+int retiradas = 2
+mutex = sem(1)
+sem_cons = sem(0)
+sem_prod = sem(1)
+
+prod(){
+
+    sem_prod.wait()
+    produce()
+    sem_cons.signal()
+}
+
+cons{
+    sem_cons.wait();
+
+    mutex.wait()
+    if(retiradas == 0){
+        sem_prod.signal()
+    }
+    retiradas--;
+    mutex.signal()
+
+    consumir(); 
+}
+
+
+---d---
+
+
+enum B,C
+int sigo_b = 2
+
+sem_cons_1 = sem(0)
+sem_cons_2 = sem(0)
+
+while(true)
+prod(){
+    sigo_b = 2;
+    sem_prod.wait()
+    produce()
+    sem_cons_1.signal()
+
+    sem_prod.wait()
+    produce()
+    sem_cons_2.signal()
+}
+
+while(true)
+cons(i){
+    if(i == 0)
+        sem_cons_1.wait();
+        if (sigo_b == 0){
+            sem_prod.signal();
+            sem_cons_1.wait();
+            sigo_b--;
+        }
+        consumir();
+        sem_cons_1.signal();
+
+    }else{
+        sem_cons_2.wait();
+        consumir();
+        sem_prod.signal();            
+}
+
+-----------13.-----------
+-----------14.-----------
+-----------16.-----------
+-----------18.-----------
+-----------20.-----------
