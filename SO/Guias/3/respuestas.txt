@@ -163,6 +163,44 @@ cons(i){
 }
 
 -----------13.-----------
+mutex_1 = sem(0)
+
+array mesa = [0,....,0]
+sem_entrando = sem(0)
+
+sem_dejar entrar=sem(1)
+
+//Cómo doy prioridad a las que ya tienen a alguien, array y que se de señal a si mismo
+
+
+mesa(i){
+    sem_dejar_entrar.wait()
+
+    if(mesas_llenas==N){
+        sem_mesa_llena.wait()
+    }
+
+    dejar_entrar()
+    
+    MUTEX.signal
+    mesa[i]++
+    if(mesa[i] == 4){
+        mesas_llenas++
+        jugar()
+        mesa[i] = 0
+        sem_mesa_llena.signal()
+    }else{
+        sem_dejar_entrar.signal()   //como hago para llenar el que empezó? arrays
+    }
+    MUTEX.wait
+}
+
+13. de vuelta
+
+    cliente()
+
+
+
 -----------14.-----------
 -----------16.-----------
 -----------18.-----------
