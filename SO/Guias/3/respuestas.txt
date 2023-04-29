@@ -202,6 +202,36 @@ mesa(i){
 
 
 -----------14.-----------
+avisarOxigeno = sem(0)
+barreraH = sem(0)
+dejarpasar = sem(1)
+
+oxigeno()
+	llegaOxigeno()
+	avisarOxigeno.wait
+	barreraH.signal(2)
+	unir()
+	
+hidrogeno()
+	llegaHidrogeno()
+	dejarpasar.wait
+	hidrogeno++
+	if(hidrogeno==2)
+		avisarOxigeno.signal()
+	else{
+		dejarpasar.signal()
+	}
+	
+	barreraH.wait()
+	
+	unir()
+	
+	mutex
+	hidrogeno--
+	if(hidrogeno==0)
+		dejarpasar.signal()
+	mutex
+
 -----------16.-----------
 -----------18.-----------
 -----------20.-----------
