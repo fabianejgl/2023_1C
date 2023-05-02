@@ -27,7 +27,7 @@ void ejecutarHijo( int i, int pipes[][2]) {
     pipe(pipeNieto);
     pid_t nieto = fork();
     if (nieto == 0){
-        ejecutarNieto(i, pipes, pipeNieto, getpid(), numero);
+        ejecutarNieto(pipeNieto, getppid(), numero);
     } else {
         while(!nietoTermino){
 
@@ -43,7 +43,7 @@ void ejecutarHijo( int i, int pipes[][2]) {
 
 
 
-void ejecutarNieto(int i, int pipes[][2], int pipeNieto[2], pid_t padre, int numero) {
+void ejecutarNieto(int pipeNieto[2], pid_t padre, int numero) {
     int resultado = calcular(numero);
     kill(padre, SIGTERM);
     write(pipeNieto[1], &resultado, sizeof(resultado));

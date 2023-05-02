@@ -1,0 +1,20 @@
+permisoPuente = sem(1)
+mutex1=[sem 1, sem 1]
+mutex2=[sem 1, sem 1]
+
+
+auto(i)
+	mutex1[i].wait
+	if autoscruzando[i]==0
+		permisoPuente.wait
+	autoscruzando[i]++
+	mutex1[i].signal
+	
+	cruzar()
+	
+	mutex2[i].wait
+	autoscruzando[i]--
+	if(autoscruzando[i]==0)
+		permisoPuente.signal()
+	
+	mutex2[i].signal

@@ -1,0 +1,38 @@
+mutex1, mutex2, mutex3 = sem(1)
+barrera1 = sem(0)
+barrera2 = sem(0)
+
+programa()
+	WHILE(TRUE){
+		primera_f()
+		
+		mutex1.wait()
+		pasaron++
+		if pasaron== N
+			barrear1.signal(N)	
+		mutex1.signal()
+		
+		barrera1.wait()
+		
+		segunda_f()
+		
+		mutex2.wait()
+		pasaron--
+		if pasaron == 0
+			barrera2.signal()
+		mutex2
+		
+		barrera2.wait()
+		
+		tercera_f()
+		
+		mutex3
+		pasaron++
+		if pasaron == N
+			pasaron = 0
+			mutex1.signal()
+			mutex2.signal()
+			mutex3.signal()
+		mutex3
+	}
+			
