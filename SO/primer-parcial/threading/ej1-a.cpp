@@ -7,10 +7,11 @@
 using namespace std;
 
 void f () {
-    this_thread::sleep_for(500ms);
+    this_thread::sleep_for(500ms);      //para dormir a un thread.
     cout << " Hello thread " << endl;
 }
 
+//Procesos principal
 int main(int argc, char const *argv[]){
     // lanzamos un thread
     for(int i = 0; i < 10; ++i){

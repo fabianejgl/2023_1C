@@ -13,7 +13,7 @@ mutex mtx;  //variable compartida por todos los threads por estar afuera de todo
 
 void f (int i) {
     //this_thread::sleep_for(1000ms * i);
-    lock_guard<mutex> lockk(mtx);
+    lock_guard<mutex> lockk(mtx);           //Se desbloque cuando CIERRA EL SCOPE donde está definido.
     cout << " Hello thread:" << i << endl;
     // this_thread::sleep_for(100ms);       //eso hace que salga lo mas posible en orden, pero no garantiza
     cout << " Bye thread:" << i << endl;

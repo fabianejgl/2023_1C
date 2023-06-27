@@ -1,0 +1,367 @@
+---EJERCICIO-2---
+	int driver_init(){
+		//Major, minor y esas cosas
+		return IO_OK;
+	}
+	int driver_open(){
+		return IO_OK;
+	}
+	int driver_close(){
+		return IO_OK;
+	}
+
+	int driver_read(int *data){
+		int current_time = IN(CHRONO_CURRENT_TIME)
+		copy_to_user(data, &current_time, sizeof(int));
+		return IO_OK;
+	}
+
+	int driver_write(int *data){
+		OUT(CHRONO_CTRL, CHRONO_RESET);
+		return IO_OK;
+	}
+
+	int driver_remove(){
+		return IO_OK;
+	}
+
+---EJERCICIO-3---
+		#define BIT1_MASK 0b11111101
+	//Preguntar si es necesario hacer esto en los ejs
+	static struct cdev btn_dev;
+	static dev_t num;
+
+	static struct file_operations btn_op{
+		.owner = THIS_MODULE,
+		.open = driver_open,
+		.close = driver_close,
+		.read = driver_read,
+		.write = driver_write
+	}
+	//
+
+
+	int driver_init(){
+		return IO_OK;
+	}
+	int driver_open(){
+		return IO_OK;
+	}
+	int driver_close(){
+		return IO_OK;
+	}
+
+	int driver_read(int *data){
+		while (0 == (IN(BTN_STATUS) & 0x01)); //busy waiting
+		
+		int res = BTN_PRESSED;
+		copy_to_user(data, &res, sizeof(int));
+		
+		return IO_OK;
+	}
+
+	int driver_write(int *data){
+		//Limpiar memoria de la tecla poniendo 2° bit en 0
+		OUT(BTN_STATUS, BTN_STATUS & BIT1_MASK);
+		return IO_OK;
+	}
+
+	int driver_remove(){
+		return IO_OK;
+	}
+	
+	
+---EJERCICIO-4---
+	#define BIT1_MASK 0b11111101
+	semaphore pressed;
+
+	int driver_init(){
+		sem_init(&pressed, 0);
+		if (request_irq(7, handler))		//handler, interrupcion
+			return IO_ERROR;
+		else
+			return IO_OK;
+	}
+
+	void handler() {				//Handler
+		pressed.signal();
+	}
+	
+	int driver_open(){
+		return IO_OK;
+	}
+
+	int driver_close(){
+		return IO_OK;
+	}
+
+	int driver_read(int *data){
+		pressed.wait();			//sem
+
+		int res = BTN_PRESSED;
+		copy_to_user(data, &res, sizeof(res));
+		
+		return IO_OK;
+	}
+
+	int driver_write(int *data){
+		//Limpiar memoria de la tecla poniendo 2° bit en 0
+		OUT(BTN_STATUS, BTN_INT); 
+		return IO_OK;
+	}
+
+	int driver_remove(){
+		if (free_irq(7))
+			return IO_ERROR;
+		else
+			return IO_OK;
+	}
+	
+
+---EJERCICIO-5---
+
+	- a) Acciones que debe tomar el admin de E/S cuando se efectúa un open.
+	    - Chequear por errores específicos del driver antes de completar el open
+	    - Inicializar el dispositivo si se abre por primera vez (si es necesario)
+	    - Identificar el dispositivo que se abrió chequeando el *MINOR*
+	    
+	- b) Acciones que debe tomar el admin de E/S cuando se efectúa un write.
+	    - Copia los datos del buffer del usuario a uno creado en el espacio de kernel
+	     utilizando `copy_from_user()` para chequear permisos y evitar errores.
+	    - Escribe la cantidad ****size**** del contenido del buffer en el device
+	    - Retorna la cantidad de bytes escritos, o un numero negativo si ocurrio un error.
+
+---EJERCICIO-6---
+-¿Cuál debería ser el nivel de acceso para las syscalls IN y OUT? ¿Por qué?
+	Deberían ser de nivel de kernel ya que esas syscalls escriben en los registros de los
+	dispositivos, y es el driver el encargado de realizar las escrituras y las lecturas en los
+	registros cuando corresponda. El usuario no tiene por qué saber qué registros hay que tocar
+	del dispositivo. Si quiere comunicarse con el dispositivo, lo tiene que hacer a través del
+	driver.
+
+
+---EJERCICIO-7---
+	a) Implementar la función write(int sector, void *data) del driver, que escriba los datos
+	apuntados por data en el sector en formato LBA indicado por sector. Para esta primera
+	implementación, no usar interrupciones.
+	
+	int device_write(int sector, void *data) {
+	if (!IN(DOR_STATUS)) {
+		OUT(DOR_IO, 1); //Enciende
+	}
+	sleep(50);  //Espera a que la velocidad rotacional sea suficientem esté o no encendido?
+
+	int pista = sector / cantidad_sectores_por_pista();
+	int local_sector = SECTOR % cantidad_sectores_por_pista();
+	
+	void *buffer_data = malloc(...); 	//LBA_size?
+	copy_from_user(data, &buffer_data); 	//Hace falta copy_from_user? (ya que no hay 'size')
+	
+	OUT(ARM, pista);
+	OUT(SEEK_SECTOR, local_sector);
+	
+	while(!IN(ARM_STATUS)); 		//Esperamos a que el brazo este en la pista
+	escribir_datos(buffer_data);
+	while(!IN(DATA_READY)); 		//Esperamos a que se haya enviado el dato
+	
+	OUT(DOR_IO, 0); 			//Apaga
+	sleep(200); 				//Esperamos a que se apague completamente
+	
+	return IO_OK;
+}
+
+	b) Modificar la función del inciso anterior utilizando interrupciones. La controladora del 
+	disco realiza una interrupción en el IRQ 6 cada vez que los registros ARM_STATUS o 
+	DATA_READY toman el valor 1. Además, el sistema ofrece un timer que realiza una 
+	interrupción en el IRQ 7 una vez cada 50 ms. Para este inciso, no se puede utilizar la
+	función sleep.
+	
+	mutex acceso;
+	semaphore arm_sem;
+	semaphore data_ready;
+	semaphore encendido;
+	semaphore apagado;
+	bool encendiendo;
+	bool apagando;
+	bool esperando_brazo;
+	bool escribiendo;
+	int count_50ms;
+	int count_200ms;
+
+	void handler_reg() {
+	   if (esperando_brazo && IN(ARM_STATUS)){
+		esperando_brazo = false;
+		arm_sem.signal();
+	    } else if (escribiendo && IN(DATA_READY)) {
+		escribiendo = false;
+		data_ready.signal();
+	    }
+	}
+
+	void handler_timer() {
+		if (encendiendo) { 	       //Si se esta esperando 50ms
+			if (count_50ms == 0)   //Ignorar el primer int, porq puede ser menor a 50ms
+				count_50ms++;
+			else {
+				count_50ms = 0;
+				encendiendo = false;
+				encendido.signal();
+			}
+		}
+		if (apagando) {
+			if (count_200ms < 4) //0 = Ignorar, 1 = 50ms, 2 = 100ms, 3 = 150ms
+				count_200ms++;
+			else {               // 4 = 200ms
+				count_200ms = 0;
+				apagando = false;
+				apagado.signal();
+			}
+		}
+	}
+
+	int driver_init() {
+	  	mutex_create(&acceso);
+		sem_init(&encendido, 0);
+		sem_init(&apagado, 0);
+		sem_init(&arm_sem, 0);
+		sem_init(&data_ready, 0);
+
+		encendiendo = false;
+		apagando = false;
+		esperando_brazo = false;
+		escribiendo = false;
+
+		count_50ms = 0;
+		count_200ms = 0;
+
+		if (request_irq(6, handler_reg) == IRQ_ERROR)
+		   return IO_ERROR;
+		if (request_irq(7, handler_timer) == IRQ_ERROR)
+		   return IO_ERROR;
+	    
+		return IO_OK;
+	}
+
+	int device_write(int sector, void *data) {
+                acceso.lock(); 		//Para que no escriban dos a la vez (Habrá otra forma?)
+
+		if (!IN(DOR_STATUS)) { 		//0 = Apagado (o en proceso de apagarse)
+			OUT(DOR_IO, 1); 	//Enciende
+			encendiendo = true;
+			encendido.wait();
+		} //Y si ya estaba encendido (¿?)
+
+		int pista = sector / cantidad_sectores_por_pista();
+		int local_sector = sector % cantidad_sectores_por_pista();
+		void *buffer_data = malloc(...); 		//LBA_size?
+		copy_from_user(data, &buffer_data); 		//Hace falta copy_from_user? (ya que no hay 'size')
+		
+		OUT(ARM, pista);
+		OUT(SEEK_SECTOR, local_sector);
+		esperando_brazo = true;
+		arm_sem.wait();				//Esperamos a que el brazo este en la pista
+
+		escribir_datos(buffer_data);
+		escribiendo = true;
+		data_ready.wait(); 			//Esperamos a que se haya enviado el dato
+			
+		OUT(DOR_IO, 0); 			//Apaga
+		apagando = true;
+		apagado.wait(); 			//Esperamos a que se apague completamente
+			
+		acceso.unlock();
+		return IO_OK;
+	}
+
+PREGUNTAS:	Lo que no entiendo es cuándo se llaman a las inrerrupciones. Siempre de hacer un write se apaga??????S
+
+
+---EJERCICIO-8---
+	Registros de escritura:
+
+	- LOC_TEXT_POINTER
+	- LOC_TEXT_SIZE
+	- LOC_CTRL
+
+	Registros de lectura:
+
+	- LOC_STATUS
+	- LOC_CTRL
+
+	Constantes:
+
+	- START		en loc_ctrl
+	- LOW_INK	en loc_ctrl
+	- PRINTING	en loc_ctrl
+	- FINISHED	en log_ctrl
+	
+	- READY		en loc_status
+	- BUSY		en loc_status
+	
+	mutex access;
+	semaphore finish;
+	bool imprimiendo;
+
+	void handler_finish() {
+	    if (imprimiendo && IN(LOC_CTRL) == FINISHED) { 	//Hace falta la guarda?
+		imprimiendo = false;
+		finish.signal();
+	    }
+	}
+
+	int driver_init() {
+	    mutex_create(&access);
+	    sem_init(&semaphore, 1);
+	    imprimiendo = false;
+
+	    if (request_irq(HP_FINISHED_INT, handler_finish) == IRQ_ERROR)
+		return IO_ERROR;
+	    
+	    return IO_OK;
+	}
+
+	int driver_remove(){
+	    free_irq(HP_FINISHED_INT);
+
+	    return IO_OK;
+	}
+
+	int driver_write(void* data){
+	    //Supongo que data es un puntero a string (no se si se considera "buena práctica")
+	    size_t size = strlen(data); 
+	    void *buffer = malloc(size);
+	    copy_from_user(&buffer, data, size);
+
+	    access.lock(); 			//Impresiones son bloqueantes
+	    OUT(LOC_TEXT_POINTER, buffer);
+	    OUT(LOC_TEXT_SIZE, size);
+	    OUT(LOC_CTRL, START);
+
+	    //Hacemos polling porque se supone que el chequeo se hace rápidamente
+	    
+	    int tries = 5;
+	    //Solo estará en BUSY al estar imprimiendo, y LOC_CTRL no es FINISHED porque pusimos START
+	    while(IN(LOC_STATUS) == READY && tries) { 
+		if (IN(LOC_CTRL) == LOW_INK) {
+		    OUT(LOC_CTRL, START);
+		    tries--;
+		}
+	    }
+	    if (!tries) { 		//No hay tinta
+		access.unlock();
+		free(buffer);
+		return IO_ERROR;
+	    }
+	    //**Comenzó a imprimir: (LOC_STATUS != READY) => (LOC_STATUS == BUSY)
+	    imprimiendo = true;
+    finish.wait(); 			//Esperamos interrupt, ya que la impersión puede tardar
+	    
+	    access.unlock(); 		//Terminamos, liberamos mutex
+
+	    return IO_OK;    
+	}
+	
+	
+PREGUNTAS: Se pone automáticamente en Busy el loc_status?????
+
+		

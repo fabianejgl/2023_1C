@@ -15,23 +15,17 @@ int main(int argc, char const *argv[]){
     // lanzamos un thread
     vector<thread> threads;
 
-    for(int i = 0; i <10; ++i){
+    for(int i = 0; i<10; ++i){
         //push back no se pueda -> un thread no es COPYABLE
-        threads.emplace_back(f);    //crea el thread al momento de colocarlo. 
+        threads.emplace_back(f);    //crea el thread al momento de colocarlo.
     }
-
-    // for(int i = 0; i < 10; ++i){
-    //     new thread(f);
-    // }
 
     for(auto &t: threads){
         //opcion1
         t.join();
         //opcion2
         //t.detach();
-
     }
-
 
     //sleep(1);
     return(0);
