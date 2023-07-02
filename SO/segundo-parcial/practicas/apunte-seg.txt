@@ -1,0 +1,189 @@
+---SEGURIDAD---:
+-Uusario no controla inputs de programa pero
+SI CONTROLA LAS VARIABELS DEL ENTORNO
+
+-SETUID ELEVA PRIGILEGIOS DEL PROGRAMA ACTUAL AL PARAMETRO APSADO, POR EJ A ROOT SERÍA
+SETUID(0)
+
+ENUNCIADO PARCIAL: ANALIZAR EXPLOIT, DECIR CON QUE INPUT SE PUEDE VULNERAR, FORMAS DE IMPACTO Y COMO CORREGIR.
+
+
+NOTA1: SHEBANG-> "#!/bin/sh " al inicio de archivo, esto te dice que "este archivo ejecutalo con /bin/sh" y luego ejecuta el resto del archivo, por ejemplo en el CASO2 en el archivo después de esa primer línea hace:
+	-echo "Ejecutando un shell"
+	-/bin/sh
+
+NOTA2: -> CADA CASO/EJERCICIO ES UNA VERSIÓN MODIFICADA DEL ANTERIOR PARA MEJOR COMPRENSIÓN
+
+NOTA3: LLAMAR A SYSTEM SIEMPRE ES SUPERPELIGROSOS
+	-ejminuto 59 o diapo 13: systen(command)
+
+NOTA4: LLEVAR ESQUEMA DE PILA AL PARCIAL
+
+NOTA5: 	-PRINCIPIO DE PRIVILEGIO MINIMO: SOLAMENTE LE ASIGNO LOS PERMISOS A LO QUE NECESITE Y LE ASIGNO EL MINIMO PERMISO POSIBLE
+
+----------CASO1 FORMAT STRING-------
+	ping -c 4 "programa"
+	ej: 	ping -c 4 8.8.8.8
+
+Si el archivo tiene -rwSr-xr-x		La S quiere decir que el que corra ese ejecutable va poder elevar los privilegios al owner del archivo. Osea si el owner es root y yo lo corro, entonces estoy haciendo que el ping corra con permisos de roots
+
+Así serán la mayoria de ejs, están hechos para hacer una sola cosa en root pero terminan haciendo más cosas de las que necesitamos
+
+-Si hacemos en el codigo del programa SETUID(0) pero NO TIENE la S, no va funcionar. Se necesitan AMBAS COSAS
+
+-En el shell el ';' separa 2 comandos distintos
+	./ping "8.8.8.8 ; bash" 	o 		./ping "8.8.8.8 & bash"
+	-Me va abrir un bash como ROOT y si pongo Exit vuelvo a mi usuario
+	-Ya en bash puedo ejecutar lo que quiera...
+	-EL problema es que en argv puedo pasarle lo que quiera
+	
+		Impacto: ESCALAMIENTO DE PRIVILEGIOS -> En bash puedo ahcer lo que quiera
+	CÓMO SOLUCIONAR?
+		-El problema es que no chequeo el String, no estoy chequeando lo que pone el user
+		-Solución puede ser NO PERMITIR que escriba ;
+		-Solución: whitelist/blacklist -> La primera valida que el input cumpla le formato 
+		permitido, blacklist en cambio tiene a los chars que NO SON permitidos, sanitiza.
+		Ej: whitelist, mi universo de respuestas permitidas son nnn.nnn.nnn.nnn
+		    blacklist, filtra lo ingresado, elimina los caracteres invalidad
+		  
+		Esto se llama: VALIDA EL INPUT.
+
+
+----------CASO1 Enmironment Variables-------
+	Variables de entorno hay en Linux y Windows
+	-Si hago echo $PATH, me muestro la lista de carpetas donde va a buscar el programa que quiero que ejecute, lo buscará en ese ORDEN.
+	-Entonces si tengo 2 del mismo nombre en distintas carpetas, ejecutará el primero que encuentre
+	-MINUTO 37: -> EXPLICA lo que hace, modifica Path, crea otro ping
+	-Básicamente hace el comando "export" PATH="/tmp:$PATH" que lo que hace es AGREGAR tmp como primera carpeta donde se busca lo que quiero ejecutar, es decir al hacer "echo $PATH" de la sesión actual de shell, ahora me aparecerá como primer carpeta "/tmp" y ahí es donde había creado OTRO "ping" (dandole permisos de ejecución y que dentro tiene un texto que ejecuta un shell). 
+	
+	-El $PATH SE PUEDE CAMBIAR sin permisos de ROOT (CON CUALQUIER PERMISO SE PUEDE) porque no es un cambio que afecte a todo el SO, solo afecta a mí usuario, y no lo afecta a nivel GLOBAL, solo afecta a la sesión de Shell que estoy corriendo yo.
+		-Si abro 2 sesiones de shell, el cambio solo se verá en la que hice la modificación del PATH con el comando "export path="/tmp"
+		
+	-ESTO NO ATACA AL PROGRAMA DIRECTAMENTE EN SÍ, SINO QUE APROVECHA QUE SE DELEGA AL SISTEMA que busque al programa "ping" en el PATH, entonces yo me creo uno que aparezca antes que ese para que ejecute lo que yo quiera.
+	
+	-RESUMEN: modificar PATH, dentro del PATH crear un archivo que haga lo que yo quiera. Despues de crear el archivo PING con lo que quiero que haga, hago "chmod +x /tmp/ping" para darle permisos de ejecución.
+	En orden: primero crear el archivo y hacer lo de arriba, luego cambiar el PATH con "export PATH ="/tmp:$PATH"". 
+	
+	
+----------CASO3 BUFFER OVERFLOW-------
+
+	-Al ingresar un password de más de 100 caracteres, se pisa lo demás, es decir si meto 100 caracteres y lo que sobra que agrego es distinto de 0, va a llenar el "valid" del struct con un True, ya que cualquier bool con cualquiera de sus bits != 0 es True
+	
+	-Esto por cómo se guarda el struct...
+	
+	-Si me paso con la cant de letras, me sale Segmentation Fault, sería un bug. Quiero que haya overflow solo hasta el Valid (así queda en True)
+	
+	-Como solución se compara el valid con login_data.password
+	
+	-EN ESTE EJEMPLO LAS VARIABLES ESTÁN EN BSS PORQUE ESTÁN FUERA DEL MAIN CREO, SON GLOBALES. EN CASO DE ESTAR EN EL MAIN ENTONCES ESTARÍAN EN EL STACK
+
+
+----------CASO 4 BUFFER (STACK) OVERFLOW-------
+
+	-EN ESTE CASO ESTÁN EN EL STACK POR ESTAR EN MAIN?
+	-DIBUJO STACK -> SABER QUE ES ARRIBA Y QUE ES ABAJO
+STACK
++
+|	XXXX		|
+|	retorno		|
+|	RBP		| <--RBP, RSP
+|	PASSWORD[3]	|
+|	PASSWORD[2]	|
+|	PASSWORD[1]	| "chauchau"
+|	PASSWORD[0]	| "holahola"<-- RSP
+|			|
+|			|
+|			|
+-
+
+| PASSWORD[0] | PASSWORD[0] | PASSWORD[0] |  PASSWORD[0] |
+   "holahola"	 "chauchau"
+
+	NOTA: TODO LO QUE ESTÁ HACIA ARRIBA DE *RBP* PERTENECE A LA FUNCION ANTERIOR. LO DE ABAJO A LA ACTUAL
+
+Ahora pruebo con otro ejemplo
+"holaholachauchauholaholachauchau1234567812345678"
+
++
+|	XXXX		|
+|	retorno		| "12345678"
+|	RBP		| "12345678"<--RBP, RSP
+|	PASSWORD[3]	| "chauchau"
+|	PASSWORD[2]	| "holahola"
+|	PASSWORD[1]	| "chauchau"
+|	PASSWORD[0]	| "holahola"<-- RSP
+|			|
+-
+
+| PASSWORD[0] | PASSWORD[1] | PASSWORD[2] |  PASSWORD[3]   | 	rbp	|     retornar	  |
+   "holahola"	 "chauchau"    "holahola"	"chauchau"   "12345678"     "12345678"
+
+Si llego a retorno, si en el IF se retorna es 1 (true), llama a login_ok. Si es 0 salta a login_fail. La idea es que retorno tenga
+la dirección o respuesta que me convenga para que inicie sesión.
+
+Minuto 2:12
+	-Deshabilita la randomizacion de direcciones al cargar cada vez el programa
+	-asmr randomiza las direcciones, tonces no puedo hacer ataques porque no tengo como hardcodear las direcciones si las obtuve antes. Pero lo puedo desactivar. "echo 0 > /proc/sys//kernel/randomize_va_space"
+	-Ahora cada vez que escribo vuelve a salir la misma direccion siempre.
+	
+	-En retorno tengo que poner la direccion de alguna otra funcion que me permita ahcer lo que quiero, escalar privilegios, etc. En este caso es escalamiento de privilegios.
+	-minuto 2:27 en adelante explica de 0 los pasos resumidos
+	
+	-Justificacion, DIBUJAR LA PILA
+	-ACA SE GUARDA ESTO ACA OTRA COSA ...
+	-ACA VA ESTAR LA DIRECCION DE RETORNO QUE SALTA A TAL LUGAR...
+	-PAYLOAD ?? MINUTO 2:34
+	
+	-Según el nivel de detalle que de el ej es el nivel con el que hay que responder
+	
+	
+----------CASO 5 Int Over/Under-flow-------
+	
+	-Es problema de seguridad cuando se combina con otras cosas.
+	
+	-Input siempre da <128 porque el overflow me vuelve a negativos
+	-Minuto 2:58
+	-Denegación de servicios.
+	-En el ejemplo es mejor comparar el input directamente en el return, en vez de pasarlo a una variable.
+	-strbcpy sirve para poner un limite al copy de una variable a otra
+	
+	
+----------CASO 6 PERMISOS-------
+	-El ejemplo se fija si los simbolos están en hostname para avisar que está mal
+	-El usuario puede escribir y modificarlo.
+	-VIOLAN EL PRINCIPIO DE MINIMO PRIVILEGIO. ESTE Y EL OTRO EJERCICIO
+	
+	-PRINCIPIO DE PRIVILEGIO MINIMO: SOLAMENTE LE ASIGNO LOS PERMISOS A LO QUE NECESITE Y LE ASIGNO EL MINIMO PERMISO POSIBLE
+
+	
+----------CASO 7 - DENIAL OF SERVICE-------
+
+	-Es un ataque
+	
+	-FORK BOMB, CREA MILES DE HIJOS.
+
+----------CASO 8 - sql injection-------
+	-Ver pdf
+
+
+
+----------MECANISMOS DE PROTECCION DEL SO-------
+	-DEP: DATA EXECUTION PREVENTION (A NIVEL DE SISTEMA OPERATIVO Y SOPORTE DEL PROCESADOR)
+	-ASLR: ADDRESS SPACE LAYOUT RANDOMIZACION (REQUIERE SOPORTE DE COMPILADOR Y SISTEMA OPERATIVO, DEL PRIMERO PARA GENERAR EL EJECUTABLE INDEPENDIENTE DE POSICION Y EL SO PARA QUE CUANDO SE CARGUE EN MEMORIA, ASIGNARLE UNA DIREC RANDOM)
+	-STACK CANARIES/stack guards/stack coockes: cosas que se ponen en el stack. (no requieren soporte de procesos ni de SO, pero sí del compilador, a la hora de compilar el programa le hardcodeas el CANARIO)
+		-se agrega entre el retorno y el old_rbp (ver imagen de stack). El canario avisa.
+		-Basicamente hay un numero que si se modifica te saca del lugar
+		-Habría que pisar el canario, 2ala64 posibles numeros si quiero hacerlo por fuerza bruta
+		
+	ESTOS SON A NIVEL DEL SISTEMA OPERATIVO O COMPILADOR O AMBAS
+
+
+
+FIN:
+	-DIAGRAMA PAYLOAD
+	-DIAGRAMA STACK
+	-HACER ESTRELLAS
+	-HACER GUIAS Y LISTO PAL PARCIAL.
+	
+
+

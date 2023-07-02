@@ -1,0 +1,105 @@
+----EJERCICIO-1----
+
+	Cada bloque esta indexado en la FAT, y para leer el archivo necesito el indice del primer bloque. En principio necesito leer N veces la FAT y N veces los bloques. Por lo tanto, necesito 2N accesos al disco.
+
+
+----EJERCICIO-2----
+A-
+	128GB = 128 * 1GB = 128 * 1024MB = 128 * 1048576KB = 134.217.728KB
+
+	Entonces,
+
+	134.217.728KB / 8KB = 16.777.216 	Bloques y Entradas en la FAT
+
+	Luego, 24 B * 16.777.216 = 402.653.184 B = 393.216 KB = 384 MB
+
+B-	Un archivo de 10MB ocupa 1280 bloques, luego se podrán guardar 13 107 archivos de 10MB
+
+
+C-	
+	*VER CUADRO*
+	El archivo ocupa los bloques (en orden):
+		20, 21, 22, 3, 4, 5, 0
+	Ocupa 6 bloques ⇒ Ocupa 5 · 8 KB = 40 KB + C, donde C es algun valor mayor a 0 y menor o igual a 8KB
+
+
+----EJERCICIO-3----
+a-
+	Entradas en el inodo: 8
+
+	5 entradas directas ⇒ 5 Bloques de 4 KB
+
+	2 entradas indirectas
+
+	Cada bloque puede tener (4096 B) / 8 = 512 Direcciones de bloques
+
+	⇒ Cada bloque puede guardar 512 Bloques
+
+	⇒ 2 entradas indirectas guardan 1024 Bloques de 4 KB
+
+	Una doblemente indirecta
+
+	Cada bloque puede guardar 512 entradas indirectas
+
+	⇒ Una entrada indirecta guardan 512*512 = 262.144 Bloques de 4KB
+
+	En total se puede guardar un archivo que ocupa como máximo 1.052.692 KB = 1,003 GB	
+
+b-
+	Los archivos de 4KB pueden entrar en un bloque sin problemas
+
+	Lo mismo para los de 8 KB (en dos bloques)
+
+	Los de 2 KB van a ocupar medio bloque, con lo cual la otra mitad estará desperdiciada
+
+	Como el 50 % del espacio lo ocupan estos archivos, entonces el espacio en disco desperdiciado es del 25% (la mitad de la mitad)
+
+c-	5 MB = 5 * 1024 KB = 5120 KB = 1280 Bloques
+
+----EJERCICIO-4----
+	### (Duda: Me olvidé alguna lectura?)
+
+Suponer que se cuenta con un sistema de archivos basado en inodos y bloques de 4 KB.
+
+a) Si se tiene un archivo de 40 KB, ¿cuántos bloques es necesario leer para procesarlo
+completamente?
+    
+    40 KB $/$ 4 KB = 10 Bloques
+    
+    Buscamos el inodo en disco $(+1)$
+    
+    Si el usamos el inodo que tiene 12 entradas directas, solo hay que leer esos 10 Bloques $(+10)$
+    
+    En total: 11 Bloques
+   
+
+b) ¿Cuántos bloques es necesario leer si el archivo tiene 80 KB?
+    
+    80 KB $/$ 4 KB = 20 Bloques
+    
+    Buscamos el inodo en disco $(+1)$
+    
+    Si usamos el inodo visto en clase, leemos los primeros 12 bloques directamente $(+12)$
+    
+    Leemos la entrada 13 para conseguir el bloque de indirección $(+1)$
+    
+    Leemos los 8 bloques restantes $(+8)$
+    
+    En total: 22 Bloques
+
+
+
+Nico... 5, 6, 7 y 10
+
+
+
+
+
+
+
+
+
+
+
+
+
